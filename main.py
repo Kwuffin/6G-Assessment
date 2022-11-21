@@ -29,9 +29,9 @@ def conv_comma_to_dot(val: str):
 
 # Apply the calculation to the original DataFrame
 def add_calculated_compensation(df: pd.DataFrame):
-    df['Compensation'] = df.apply(lambda x: compensation_calculator(x['Transport'],
-                                                                    x['Distance (km/one way)'],
-                                                                    x['Workdays per week']), axis=1)
+    df[f'Compensation for {datetime.now().strftime("%B")}'] = df.apply(lambda x: compensation_calculator(x['Transport'],
+                                                                                                         x['Distance (km/one way)'],
+                                                                                                         x['Workdays per week']), axis=1)
 
     return df
 
@@ -80,12 +80,43 @@ def calc_amount_workdays(workdays):
     return workday_count
 
 
+def add_pay_date(df):
+    df['Payment date'] = find_first_monday()
+    return df
+
+
+# Find the first monday of next month
+def find_first_monday():
+    # Find the next month
+    year = datetime.now().year
+    month = datetime.now().month
+
+    if month == 12:  # If it's the last month of the year
+        month = 1
+        year += 1
+    else:
+        month += 1
+
+    # Correctly converts month to string by pasting a zero in front
+    if month < 10:
+        month = str(month).zfill(2)
+
+    return str(np.busday_offset(f"{year}-{month}", 0,
+                                roll='forward',
+                                weekmask='Mon'))
+
+
+def export_data(df: pd.DataFrame, PATH: str):
+    df.to_csv(PATH)
+    print(f"Succesfully saved to {PATH}")
+
+
 def main():
     df = load_data("data/employee_data.csv")
     df = clean_data(df)
     df = add_calculated_compensation(df)
-    df =
-    print(df)
+    df = add_pay_date(df)
+    export_data(df, "data/employee_data_compensation.csv")
 
 
 if __name__ == '__main__':
