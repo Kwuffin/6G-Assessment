@@ -1,16 +1,33 @@
+#!/usr/bin/env python
+"""6G-assessment
+
+In this file you will find all the things you need to run for the 6G-assessment.
+"""
+
 from datetime import datetime
 from calendar import monthrange
 import pandas as pd
 import numpy as np
 
 
-# Use Pandas' read_csv function to read out a csv into a pd.DataFrame
 def load_data(PATH: str):
+    """
+    Use Pandas' read_csv function to read out a csv into a pd.DataFrame
+
+    :param PATH: Path to input file
+    :return: DataFrame
+    """
     return pd.read_csv(PATH)
 
 
-# In the data we observe a string "4,5" that should be converted to a float value of 4.5
+#
 def clean_data(df: pd.DataFrame):
+    """
+    In the data we observe a string "4,5" that should be converted to a float value of 4.5
+
+    :param df: DataFrame
+    :return: DataFrame with cleaned up/consistent data
+    """
     # Make sure we also drop all NaN's
     df.dropna()
 
@@ -18,8 +35,13 @@ def clean_data(df: pd.DataFrame):
     return df
 
 
-# Replace any strings that contain commas to dots, also convert them to float values
 def conv_comma_to_dot(val: str):
+    """
+    Replace any strings that contain commas to dots, also convert them to float values
+
+    :param val: String value that might need correction
+    :return: A float value where the comma/dot has been corrected
+    """
     if type(val) == str:
         conv_val = float(val.replace(",", "."))
         return conv_val
@@ -27,8 +49,13 @@ def conv_comma_to_dot(val: str):
         return val
 
 
-# Apply the calculation to the original DataFrame
 def add_calculated_compensation(df: pd.DataFrame):
+    """
+    Apply the calculation to the original DataFrame
+
+    :param df: DataFrame
+    :return: DataFrame with added column
+    """
     df[f'Compensation for {datetime.now().strftime("%B")}'] = df.apply(lambda x: compensation_calculator(x['Transport'],
                                                                                                          x['Distance (km/one way)'],
                                                                                                          x['Workdays per week']), axis=1)
@@ -36,8 +63,15 @@ def add_calculated_compensation(df: pd.DataFrame):
     return df
 
 
-# Calculate the compensation for employee
 def compensation_calculator(transport: str, distance: int, workdays: int):
+    """
+    Calculate the compensation for employee
+
+    :param transport: Mode of transport that an Employee uses
+    :param distance: Distance that the Employee has to travel
+    :param workdays: Amount of workdays per week that an Employee has
+    :return: Compensation that an Employee gets for the month
+    """
     # Calculate compensation for one day of work.
     if transport == "Bike":
         if 5 <= distance:
@@ -55,10 +89,16 @@ def compensation_calculator(transport: str, distance: int, workdays: int):
     return amount_workdays * day_comp
 
 
-# Calculate the amount of workdays an employee works in month
 def calc_amount_workdays(workdays: int):
+    """
+    Calculate the amount of workdays an employee works in month
+
+    :param workdays: Amount of workdays per week that an Employee has
+    :return: Amount of workdays in the month
+    """
     # Date now, date can be altered to test future/past dates.
     now = datetime.today()
+    # now = Your Date Here -> also change in line 92 and 93
 
     # Get the date of first day of the month
     first_date = now.replace(day=1)
@@ -81,12 +121,22 @@ def calc_amount_workdays(workdays: int):
 
 
 def add_pay_date(df: pd.DataFrame):
+    """
+    Apply payment date to DataFrame
+
+    :param df: DataFrame
+    :return: DataFrame with added column
+    """
     df['Payment date'] = find_first_monday()
     return df
 
 
-# Find the first monday of next month
 def find_first_monday():
+    """
+    Find the first monday of next month
+
+    :return: String with the date of the first monday of the next month
+    """
     # Find the next month
     year = datetime.now().year
     month = datetime.now().month
@@ -107,6 +157,13 @@ def find_first_monday():
 
 
 def export_data(df: pd.DataFrame, PATH: str):
+    """
+    Export the data to a .csv file
+
+    :param df: DataFrame
+    :param PATH: Path to export folder
+    :return: None
+    """
     df.to_csv(PATH)
     print(f"Succesfully saved to {PATH}")
 
