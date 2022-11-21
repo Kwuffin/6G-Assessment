@@ -37,7 +37,7 @@ def add_calculated_compensation(df: pd.DataFrame):
 
 
 # Calculate the compensation for employee
-def compensation_calculator(transport, distance, workdays):
+def compensation_calculator(transport: str, distance: int, workdays: int):
     # Calculate compensation for one day of work.
     if transport == "Bike":
         if 5 <= distance:
@@ -56,7 +56,7 @@ def compensation_calculator(transport, distance, workdays):
 
 
 # Calculate the amount of workdays an employee works in month
-def calc_amount_workdays(workdays):
+def calc_amount_workdays(workdays: int):
     # Date now, date can be altered to test future/past dates.
     now = datetime.today()
 
@@ -80,7 +80,7 @@ def calc_amount_workdays(workdays):
     return workday_count
 
 
-def add_pay_date(df):
+def add_pay_date(df: pd.DataFrame):
     df['Payment date'] = find_first_monday()
     return df
 
